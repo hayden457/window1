@@ -1,56 +1,57 @@
 import tkinter as tk
+import random
 
 root = tk.Tk()
-root.title("Tkinter Calculator")
+root.title("Guess the Number")
+root.geometry("400x300")
+
+title_label = tk.Label(root, text="Guess the Number!", font=("Arial", 18))
+title_label.pack(pady=10)
+
+prompt_label = tk.Label(root, text="Enter a number (1=100):")
+prompt_label.pack()
+
+guess_entry = tk.Entry (root, width=10, justify="center")
+guess_entry.pack(pady=5)
+
+result_label = tk.Label(root, text="Good luck!", font=("Arial", 14))
+result_label.pack(pady=10)
+
+secret = random.randint(1, 100)
+
+def check_guess():
+    text = guess_entry.get().strip()
+
+    if not text.isdigit():
+        result_label.config(text="Please enter a number!")
+        return
+    
+    guess = int(text)
+
+    if guess < secret:
+        result_label.config(text="Too low!")
+
+    elif guess > secret:
+        result_label.config(text="Too high!")
+
+    else: 
+        result_label.config(text=f"You got it! The number was {secret}.")
+
+check_btn = tk.Button(root, text="Check", command=check_guess)
+check_btn.pack(pady=5)
+
+def reset_game(): 
+    global secret
+    secret = random.randint(1, 100)
+    result_label.config(text="New game! Guess again.")
+    guess_entry.delete(0, tk.END)
+
+reset_btn = tk.Button(root, text="reset")
+reset_btn.pack(pady=5)
+
+def reset_game():
+    global secret
+    secret = random.randint(1, 100)
+    guess_entry.delete(0, tk.END)
 
 root.mainloop()
-
-title = tk.label(root, text="Simple Calculator", font=("Arial", 18))
-title.grid(row=0, column=0, columnspan=4, pady=10)
-
-#Number A
-tk.Label(root, text="A:").grid(row=1, column=0, sticcky="e", padx=5)
-entry_a = tk.Entry(root, width=12, justify="right")
-entry_a.grid(row=1, column=1, padx=5, pady=5)
-
-#NumberB
-tk.Label(root, text="B:").grid(row=1, column=2, sticky="e", padx=5)
-entry_b = tk.Entry(root, width=12, justify="right")
-entry_b.grid(row=1, column=3, padx=5, pady=5)
-
-result_label = tk.Label(root, text="Result: --", font=("Arial", 14))
-result_label.grid(row=22, column=0, columnspan=4, pady=8)
-
-error_label = tk.Label(root, text="", fg="red")
-error_label.grid(row=3, column=0 columnspan=4)
-
-def parse_inputs():
-    a_text = entry_a.get().strip()
-    b_text = entry_b.get().strip()
-    if a_text == "" or b_text == "":
-        raise ValueError("Please enter both A and B.")
-    a = float(a_text)
-    b = float(b_text)
-    return a, b
-
-def show_result(value):
-    result_label.config(text=f"Result: {value}")
-    error_label.config(text="")
-
-def show_error(msg):
-    error_label.config(text=msg)
-    result_label.config(text="Result: --")
-
-def op_add()
-    try:
-        a, b = parse_inputs()
-        show_result(a + b)
-    except ValueError as e:
-        show_error(str(e))
-
-def op_sub():
-    try: 
-        a, b = parse_inputs()
-        show_result(a - b)
-    except ValueError as e:
-        show_error(str(e))
