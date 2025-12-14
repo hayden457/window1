@@ -1,57 +1,87 @@
 import tkinter as tk
-import random
 
 root = tk.Tk()
-root.title("Guess the Number")
-root.geometry("400x300")
+root.title("Drawing Pad")
 
-title_label = tk.Label(root, text="Guess the Number!", font=("Arial", 18))
-title_label.pack(pady=10)
+controls = tk.Frame(root)
+controls.grid(row=0, column=0, sticky="ew", padx=8, pady=8)
 
-prompt_label = tk.Label(root, text="Enter a number (1=100):")
-prompt_label.pack()
+canvas = tk.Canvas(root, bg="white", width=760, height=480)
+canvas.grid(row=1, column=0, sticky="nsew", padx=8, pady=8)
 
-guess_entry = tk.Entry (root, width=10, justify="center")
-guess_entry.pack(pady=5)
+root.grid_rowconfigure(1, weight=1)
+root.grid_columnconfigure(0, weight=1)
 
-result_label = tk.Label(root, text="Good luck!", font=("Arial", 14))
-result_label.pack(pady=10)
+current_color = "black"
+pen_size = 5
+last_x, last_y = None, None
 
-secret = random.randint(1, 100)
+def start_draw(event):
+    print("start")
+    global last_x, last_y
+    last_x, last_y = event.x, event.y
 
-def check_guess():
-    text = guess_entry.get().strip()
+def draw(event):
+    print("draw")
+    global last_x, last_y
+    if last_x is not None and last_y is not None:
+        canvas.create_line(last_x, last_y, event.x, event.y,
+                           fill=current_color, width=pen_size,
+                           capstyle=tk.ROUND)
+    last_x, last_y = event.x, event.y
 
-    if not text.isdigit():
-        result_label.config(text="Please enter a number!")
-        return
-    
-    guess = int(text)
+def end_draw(event):
+    print("end")
+    global last_x, last_y
+    last_x, last_y = None, None
 
-    if guess < secret:
-        result_label.config(text="Too low!")
+canvas.bind("<Button-1>", start_draw)
+canvas.bind("<B1-Motion>", draw)
+canvas.bind("<ButtonRelease-1>", end_draw)
 
-    elif guess > secret:
-        result_label.config(text="Too high!")
+def set_black():
+    global current_color
+    current_color = "black"
 
-    else: 
-        result_label.config(text=f"You got it! The number was {secret}.")
+def set_red():
+    global current_color
+    current_color = "red"
 
-check_btn = tk.Button(root, text="Check", command=check_guess)
-check_btn.pack(pady=5)
+def set_blue():
+    global current_color
+    current_color = "blue"
 
-def reset_game(): 
-    global secret
-    secret = random.randint(1, 100)
-    result_label.config(text="New game! Guess again.")
-    guess_entry.delete(0, tk.END)
+def set_green():
+    global current_color
+    current_color = "green"
 
-reset_btn = tk.Button(root, text="reset")
-reset_btn.pack(pady=5)
+btn_black = tk.Button(controls, text="Black", command=set_black)
+btn_black.grid(row=0, column=0, padx=2)
+btn_red = tk.Button(controls, text="Red", command=set_red)
+btn_red.grid(row=0, column=1, padx=2)
+btn_blue = tk.Button(controls, text="Blue", command=set_blue)
+btn_blue.grid(row=0, column=2, padx=2)
+btn_green = tk.Button(controls, text="Green", command=set_green)
+btn_green.grid(row=0, column=3, padx=2)
 
-def reset_game():
-    global secret
-    secret = random.randint(1, 100)
-    guess_entry.delete(0, tk.END)
+def change_size(value):
+    global pen_size
+    pen_size = int(value)
+
+size_label = tk.Label(controls, text="Pen size:")
+size_label.grid(row=0, column=4, padx=6)
+
+size_scale = tk.Scale(controls, from_=1, to=20,
+                      orient="horizontal",
+                      command=change_size)
+
+size_scale.set(5)
+size_scale.grid(row=0, column=5)
+
+def clear_canvas():
+    canvas.delete("all")
+
+clear_btn = tk.Button(controls, text="Clear", command=clear_canvas)
+clear_btn.grid(row=0, column=6, padx=6)
 
 root.mainloop()
