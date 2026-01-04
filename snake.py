@@ -4,9 +4,11 @@ import random
 root = tk.Tk()
 root.title("Snake - 1")
 
+game_over = False 
+
 SIZE = 20
-W = 400
-H = 400
+W = 800
+H = 800
 
 canvas = tk.Canvas(root, width=W, height=H, bg="white")
 canvas.pack()
@@ -33,11 +35,24 @@ def draw():
                                 fill="green")
         
 def game_loop():
-    global snake, food
+    global snake, food, game_over
 
     head_x, head_y = snake[0]
     new_head = (head_x + dx, head_y + dy)
 
+    if new_head[0] < 0 or new_head[0] >= W//SIZE or \
+        new_head[1] < 0 or new_head[1] >= H//SIZE:
+        game_over = True
+        #status_label.config(text="Game Over: You hit the wall!")
+        print("hit")
+        return
+    
+    print(snake)
+    if new_head in snake:
+        game_over = True
+        #status_label.config(text="Game Over: You hit yourself!")
+        return
+    
     snake.insert(0,new_head)
 
     if new_head == food:
@@ -47,9 +62,9 @@ def game_loop():
     else:
         snake.pop()
 
-
     draw()
     root.after(150, game_loop)
+    
 
 def up(event):
     global dx, dy
@@ -73,5 +88,6 @@ root.bind("<Left>", left)
 root.bind("<Right>", right)
 
 game_loop()
+#root.after(150, game_loop)
 
 root.mainloop()
