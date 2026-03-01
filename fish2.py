@@ -1,13 +1,10 @@
 import random
 import time
 
-fishes = (
-    ('Trout', 5),
-    ('Salmon', 10),
-    ('Bass', 15),
-    ('Catfish', 20),
-    ('Shark', 50)
-)
+with open('dictionary.txt', 'r') as file:
+    words = file.readlines()
+words = [word.strip() for word in words]
+print(words)
 
 #define the player's initial score and the number of turns
 score = 0
@@ -34,33 +31,44 @@ for i in range(turns):
 
     #check if the player wants to fish
     if action == 'fish':
-        print('Type any word to catch a fish!')
+        word = random.choice(words)
+        print('Type', word, ':')
+
         start_time = time.time()
 
-        #wait for the player to enter the word within the time limit
-        while True:
-            input_word = input()
-            end_time = time.time()
-            time_taken = end_time - start_time
+        typed = input('Your input:')
 
-            #check if the player typed the word within the time limit
-            if time_taken <= time_limit:
-                #choose a random fish from the list
-                fish = random.choice(fishes)
-                print('You caught a', fish[0], 'worth', fish[1], 'points!')
-                #add the fish's value to the player's score
-                score += fish[1]
-                break
+        end_time = time.time()
+
+        time_taken = end_time - start_time
+
+        print(f'n\Time taken: {time_taken:.2f} seconds')
+
+        if typed == word:
+            print('Correct!')
+
+            if time_taken <= 2:
+                points = 10
+            elif time_taken <= 4:
+                points = 7
+            elif time_taken <= 6:
+                points = 5
             else:
-                print('Sorry you took too long to cath a fish!')
+                points = 2
+
+            print('Points earned:', points)
+
+        else:
+                print('Wrong!')
+                print('Points earned: 0')
+
                 break
 
-    #invalid input
-    else:
-        print('Invalid input. Type "fish" or "quit".')
 
-    print('Score:', score, '\n')
+print('Type "fish" or "quit".')
+
+print('Score:', score, '\n')
 
 #print the final score
-print('Final scofrfe:', score)
+print('Final score:', score)
 
