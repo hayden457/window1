@@ -9,6 +9,9 @@ import random
 
 secret = [random.choice(COLOURS) for _ in range(PEGS)]
 
+def guess(selections):
+     return [selections[i].get() for i in range(PEGS)]
+
 blacks = 0
 for i in range(PEGS):
         if guess[i] == secret[i]:
@@ -134,6 +137,8 @@ status_label.grid(row=3, column=0, columnspan=6)
 feedback_text = '⚫' * blacks + '⚪' * whites
 if blacks + whites == '0':
      feedback_text = '__'
+
+row=guess_count
 tk.Label(history_frame, text-feedback_text,
          width=8, relief='groove').grid(row=row, column=PEGS+1)
 
@@ -161,7 +166,7 @@ elif guess_count >= MAX_GUESSES:
      reveal_secret()
 else:
      remanining = MAX_GUESSES - guess_count
-     status_label.config(text=f'Guess {guess_count+1} of {MAX_GUESSES}({remaining} left)')
+     status_label.config(text=f'Remaining guesses: {MAX_GUESSES - guess_count}')
 
 #Page 12
 
@@ -176,8 +181,8 @@ def new_game():
     for i, text in enumerate(['#', 'Peg 1', 'Peg 2', 'Peg 3', 'Peg 4', 'Feedback']):
      tk.Label(history_frame, text=text, font=('Arial', 11, 'bold'),
               width=8, relief='groove').grid(row=0, column=i)
-     
-     for eidget in root.grid_slaves():
+     #Page 13
+     for widget in root.grid_slaves():
           if int(widget.grid_info()['row']) == 4:
                widget.destroy()
 
