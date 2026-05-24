@@ -1,49 +1,3 @@
-#Page 3
-COLOURS = ["R", "B", "G", "Y"]
-COLOUR_NAMES = {"R": "Red", "B": "Blue", "G": "Green", "Y": "Yellow"}
-PEGS = 4
-MAX_GUESSES = 8
-
-#Page 4
-import random
-
-secret = [random.choice(COLOURS) for _ in range(PEGS)]
-
-def guess(selections):
-     return [selections[i].get() for i in range(PEGS)]
-
-blacks = 0
-for i in range(PEGS):
-        if guess[i] == secret[i]:
-            blacks += 1
-
-#Page 5
-from collections import Counter
-
-secret_counts = Counter(secret)
-guess_counts = Counter(guess)
-
-total_matched = sum(min(secret_counts[c], guess_counts[c]) for c in COLOURS)
-
-whites = total_matched - blacks
-
-#Page 6
-from collections import Counter
-
-def get_feedback(secret, guess):
-    blacks = 0
-    for i in range(PEGS):
-        if guess[i] == secret[i]:
-            blacks += 1
-
-    secret_counts = Counter(secret)
-    guess_counts = Counter(guess)
-    total_matched = sum(min(secret_counts[c], guess_counts[c]) for c in COLOURS)
-    whites = total_matched - blacks
-
-    return blacks, whites
-
-#Page 7
 import tkinter as tk
 from collections import Counter
 import random
@@ -56,7 +10,7 @@ MAX_GUESSES = 8
 
 root = tk.Tk()
 root.title('Mastermind')
-root.resizeable(False, False)
+#root.resizeable(False, False)
 
 secret = [random.choice(COLOURS) for _ in range(PEGS)]
 guess_count = 0
@@ -81,6 +35,34 @@ input_frame = tk.Frame(root)
 input_frame.grid(row=2, column=0, columnspan=6, pady=8)
 
 tk.Label(input_frame, text='Your guess:', font=('Arial', 11)).grid(row=0, column=0, padx=5)
+
+
+
+#Page 4
+
+secret = [random.choice(COLOURS) for _ in range(PEGS)]
+guess = [0] * 4
+
+# def guess(selections):
+#      return [selections[i].get() for i in range(PEGS)]
+
+def get_feedback(secret, guess):
+    blacks = 0
+    for i in range(PEGS):
+        if guess[i] == secret[i]:
+            blacks += 1
+
+    secret_counts = Counter(secret)
+    guess_counts = Counter(guess)
+    total_matched = sum(min(secret_counts[c], guess_counts[c]) for c in COLOURS)
+    whites = total_matched - blacks
+
+    return blacks, whites
+
+print(get_feedback(["Y","G","R","B"], ["R","Y","G","B"]))
+
+root.mainloop()
+'''
 
 def make_callback(index):
      def callback(val):
@@ -193,3 +175,5 @@ def new_game():
 new_game_btn = tk.Button(root, text='New Game',
                          font=('Arial', 11), command=new_game)
 new_game_btn.grid(row=5, column=0, columnspan=6, pady=6)
+
+'''
