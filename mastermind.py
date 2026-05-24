@@ -31,10 +31,10 @@ whites = total_matched - blacks
 from collections import Counter
 
 def get_feedback(secret, guess):
-    black = 0
+    blacks = 0
     for i in range(PEGS):
         if guess[i] == secret[i]:
-            black += 1
+            blacks += 1
 
     secret_counts = Counter(secret)
     guess_counts = Counter(guess)
@@ -111,7 +111,7 @@ def submit_guess():
           return
      guess = [selections[i].get() for i in range(PEGS)]
 
-     blacks, whites - get_feedback(secret, guess)
+     blacks, whites = get_feedback(secret, guess)
 
      guess_count += 1
      row = guess_count
@@ -139,7 +139,7 @@ if blacks + whites == '0':
      feedback_text = '__'
 
 row=guess_count
-tk.Label(history_frame, text-feedback_text,
+tk.Label(history_frame, text=feedback_text,
          width=8, relief='groove').grid(row=row, column=PEGS+1)
 
 def reveal_secret():
@@ -165,15 +165,15 @@ elif guess_count >= MAX_GUESSES:
      game_over = True
      reveal_secret()
 else:
-     remanining = MAX_GUESSES - guess_count
-     status_label.config(text=f'Remaining guesses: {MAX_GUESSES - guess_count}')
+     remaining = MAX_GUESSES - guess_count
+     status_label.config(text=f'Remaining guesses: {remaining}')
 
 #Page 12
 
 def new_game():
     global secret, guess_count, game_over
 
-    secret = [random.choice(COLOURS) for _ in range()]
+    secret = [random.choice(COLOURS) for _ in range(PEGS)]
 
     for widget in history_frame.winfo_children():
         widget.destroy()
