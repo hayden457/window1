@@ -1,179 +1,133 @@
 import tkinter as tk
-from collections import Counter
 import random
+from collections import Counter
 
-COLOURS = ['R', 'B', 'G', 'Y']
-COLOUR_NAMES = {'R':'Red', 'B':'Blue', 'G':'Green', 'Y':'Yellow'}
-COLOUR_HEX = {'R':'#E74C3C', 'B':'#2980B9', 'G':'#27AE60', 'Y':'#F1C40F'}
-PEGS = 4
-MAX_GUESSES = 8
+COLOURS = ['red', 'blue', 'green', 'yellow']
 
 root = tk.Tk()
 root.title('Mastermind')
-#root.resizeable(False, False)
 
-secret = [random.choice(COLOURS) for _ in range(PEGS)]
-guess_count = 0
-game_over = False
+def pick_colour(colour):
+    if len(guess) < 4:
+        guess.append(colour)
+        slot = slots[len(guess) - 1]
+        slot.config(bg=colour)
 
-header = tk.Label(root, text='Mastermind -- Crack the 4-colour code!',
-                  font=('Arial', 14, 'bold'), pady=8)
-header.grid(row=0, column=0, columnspan=6, sticky='ew')
+for colour in COLOURS:
+    btn = tk.Button(
+        root,
+        text=colour,
+        bg=colour,
+        width=8, height=2,
+        command=lambda c=colour: pick_colour(c)
+    )
+    btn.pack(side='left', padx=4, pady=10)
+    
+guess = []
+slot_frame = tk.Frame(root)
+slot_frame.pack(pady=10)
 
-#Page 8
-history_frame = tk.Frame(root)
-history_frame.grid(row=1, column=0, columnspan=6, padx=10, pady=5)
+slots = []
+for i in range(4):
+    box = tk.Label(slot_frame, text=' ', bg='white',
+                   width=6, height=2, relief='solid', borderwidth=1)
+    box.pack(side='left', padx=3)
+    slots.append(box)
 
-for i, text in enumerate(['#', 'Peg 1', 'Peg 2', 'Peg 3', 'Peg 4', 'Feedback']):
-     tk.Label(history_frame, text=text, font=('Arial', 11, 'bold'),
-              width=8, relief='groove').grid(row=0, column=i)
-     
-#Page 9
-selections = [tk.StringVar(value='R') for _ in range(PEGS)]
+secret = [random.choice(COLOURS) for _ in range(4)]
 
-input_frame = tk.Frame(root)
-input_frame.grid(row=2, column=0, columnspan=6, pady=8)
+print('SECRET (for testing):', secret) #remove later
 
-tk.Label(input_frame, text='Your guess:', font=('Arial', 11)).grid(row=0, column=0, padx=5)
-
-
-
-#Page 4
-
-secret = [random.choice(COLOURS) for _ in range(PEGS)]
-guess = [0] * 4
-
-# def guess(selections):
-#      return [selections[i].get() for i in range(PEGS)]
-
-def get_feedback(secret, guess):
+def count_blacks(guess, secret):
     blacks = 0
-    for i in range(PEGS):
+    for i in range(4):
         if guess[i] == secret[i]:
             blacks += 1
+    return blacks
 
-    secret_counts = Counter(secret)
-    guess_counts = Counter(guess)
-    total_matched = sum(min(secret_counts[c], guess_counts[c]) for c in COLOURS)
-    whites = total_matched - blacks
+result_label = tk.Label(root, text='Pick 4 colours, then check',
+                        font=('Arial', 12))
+result_label.pack(pady=8)
+
+guesses_used = 0
+MAX_GUESSES = 8
+
+def check_guess():
+    global guesses_used
+
+    if len(guess) < 4:
+        result_label.config(text='Pick 4 colours first!')
+        return
+    
+    guesses_used += 1
+    blacks, whites = count_pegs(guess, secret)
+    
+    if blacks == 4:
+        result_label.config(
+            text=f'You win in {guesses_used} guesses!'
+        )
+    elif guesses_used >= MAX_GUESSES:
+        result_label.config(
+            text=f'Out of guesses! Code was {secret}'
+        )
+    else:
+        left = MAX_GUESSES - guesses_used 
+        result_label.config(
+            text=f'Black: {blacks}  White: {whites} ({left} guesses left)'
+        )
+    clear_guess()
+
+def new_game():
+    global secret, guesses_used
+    secret = [random.choice(COLOURS) for _ in range(4)]
+    guesses_used = 0
+    clear_guess()
+    result_label.config(text='New game! Pick 4 colours.')
+    print('SECRET (for testing):', secret)
+
+new_btn = tk.Button(root, text='New Game', command=new_game)
+new_btn.pack(pady=4)
+
+def clear_guess():
+    guess.clear()
+    for box in slots:
+        box.config(bg='white')
+
+check_btn = tk.Button(root, text='Check', command=check_guess)
+check_btn.pack(pady=4)
+
+clear_btn = tk.Button(root, text='Clear', command=clear_guess)
+clear_btn.pack(pady=4)
+
+def count_pegs(guess, secret):
+    secret_left = list(secret)
+    guess_left = list(guess)
+
+    blacks = 0
+    whites = 0
+
+    for i in range(3, -1, -1):
+        if guess_left[i] == secret_left[i]:
+            blacks += 1
+            secret_left.pop(i)
+            guess_left.pop(i)
+
+    for colour in guess_left:
+        if colour in secret_left:
+            whites += 1
+            secret_left.remove(colour)
 
     return blacks, whites
 
-print(get_feedback(["Y","G","R","B"], ["R","Y","G","B"]))
+def count_pegs_advanced(guess, counter):
+    blacks = sum(g == s for g, s in zip(guess, secret))
+
+    secret_count = Counter(secret)
+    guess_count = Counter(guess)
+    total = sum(min(secret_count[c], guess_count[c]) for c in COLOURS)
+
+    whites = total - blacks
+    return blacks, whites
+
 
 root.mainloop()
-'''
-
-def make_callback(index):
-     def callback(val):
-          on_dropdown_change(val, index)
-     return callback 
-
-for i in range(PEGS):
-     om = tk.OptionMenu(
-          input_frame,
-          selections[i],
-          *[COLOUR_NAMES[c] for c in COLOURS],
-          command=make_callback(i)
-     )
-     om.config(width=8)
-     om.grid(row=0, column=i+1, padx=3)
-
-NAME_TO_LETTER = {v: k for k, v in COLOUR_NAMES.items()}
-
-def on_dropdown_change(name, idx):
-     selections[idx].set(NAME_TO_LETTER[name])
-
-#Page 10
-
-def submit_guess():
-     global guess_count, game_over
-
-     if game_over:
-          return
-     guess = [selections[i].get() for i in range(PEGS)]
-
-     blacks, whites = get_feedback(secret, guess)
-
-     guess_count += 1
-     row = guess_count
-
-     tk.Label(history_frame, text=str(guess_count),
-              width=8, relief='goove').grid(row=row, column=0)
-     
-     #Page 11
-     for i, letter in enumerate(guess):
-          tk.Label(history_frame,
-                   text=COLOUR_NAMES[letter],
-                   fg='white', width=8, relief='groove'
-                   ).grid(row=row, column=i+1)
-
-submit_btn = tk.Button(input_frame, text='Submit Guess',
-                       font=('Arial', 11), command=submit_guess)
-submit_btn.grid(row=0, column=PEGS+1, padx=10)
-
-status_label = tk.Label(root, text=f'Guess 1 of {MAX_GUESSES}',
-                        font=('Arial', 12), pady=6)
-status_label.grid(row=3, column=0, columnspan=6)
-          
-feedback_text = '⚫' * blacks + '⚪' * whites
-if blacks + whites == '0':
-     feedback_text = '__'
-
-row=guess_count
-tk.Label(history_frame, text=feedback_text,
-         width=8, relief='groove').grid(row=row, column=PEGS+1)
-
-def reveal_secret():
-    reveal_frame = tk.Frame(root)
-    reveal_frame.grid(row=4, column=0, columnspan=6, pady=4)
-
-    tk.Label(reveal_frame, text='Secret code:',
-             font=('Arial', 11, 'bold')).grid(row=0, column=0, padx=5)
-
-    for i, letter in enumerate(secret):
-        tk.Label(reveal_frame,
-                 text=COLOUR_NAMES[letter],
-                 bg=COLOUR_HEX[letter],
-                 fg='white', width=8, relief='groove'
-                 ).grid(row=0, column=i+1)
-
-if blacks == PEGS:
-     status_label.config(text=f'You cracked it in {guess_count} guesses!')
-     game_over = True
-     reveal_secret()
-elif guess_count >= MAX_GUESSES:
-     status_label.config(text='Out of guesses! See the secret below.')
-     game_over = True
-     reveal_secret()
-else:
-     remaining = MAX_GUESSES - guess_count
-     status_label.config(text=f'Remaining guesses: {remaining}')
-
-#Page 12
-
-def new_game():
-    global secret, guess_count, game_over
-
-    secret = [random.choice(COLOURS) for _ in range(PEGS)]
-
-    for widget in history_frame.winfo_children():
-        widget.destroy()
-
-    for i, text in enumerate(['#', 'Peg 1', 'Peg 2', 'Peg 3', 'Peg 4', 'Feedback']):
-     tk.Label(history_frame, text=text, font=('Arial', 11, 'bold'),
-              width=8, relief='groove').grid(row=0, column=i)
-     #Page 13
-     for widget in root.grid_slaves():
-          if int(widget.grid_info()['row']) == 4:
-               widget.destroy()
-
-     status_label.config(text=f'Guess 1 of {MAX_GUESSES}')
-
-     for s in selections:
-          s.set('R')
-new_game_btn = tk.Button(root, text='New Game',
-                         font=('Arial', 11), command=new_game)
-new_game_btn.grid(row=5, column=0, columnspan=6, pady=6)
-
-'''
