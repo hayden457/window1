@@ -14,9 +14,6 @@ root.title("15 Puzzle")
 canvas = tk.Canvas(root, width=WIDTH, height=HEIGHT, bg="white")
 canvas.pack()
 
-root.mainloop()
-
-
 board = [
     [1, 2, 3, 4],
     [5, 6, 7, 8],
@@ -54,7 +51,7 @@ def find_empty():
                 return r, c
             
 def is_adjacent(r1, c1, r2, c2):
-    return abs(r1 - r2) + abs(c1 - c2)
+    return abs(r1 - r2) + abs(c1 - c2) == 1
 
 def click(event):
     c = event.x // SIZE
@@ -66,9 +63,9 @@ def click(event):
     er, ec = find_empty()
 
     if is_adjacent(r, c, er, ec):
-        board[er][ec] = board[r][c]
-        board[r][c] = ""
+        board[er][ec], board[r][c] = board[r][c], board[er][ec]
         draw_board()
+canvas.bind("<Button-1>", click)
 
 def shuffle():
     for _ in range(100):
@@ -101,3 +98,6 @@ def is_solved():
 
 if is_solved():
     print("Solved!")
+
+root.mainloop()
+
