@@ -1,5 +1,19 @@
 import tkinter as tk
 
+def load_map(filename):
+    with open(filename, 'r') as f:
+        lines = f.readlines()
+        if len(lines) == 0:
+            raise ValueError('Map is empty')
+
+        lines = [line.strip() for line in lines]
+
+        return lines
+
+MAP = load_map('maps/map1.txt')
+print(MAP)
+print(len(MAP), len(MAP[0]))
+
 TILE = 48
 ROWS = len(MAP)
 COLS = len(MAP[0])
@@ -17,8 +31,8 @@ player_c = 0
 for r in range(ROWS):
     for c in range(COLS):
         if MAP[r][c] == 'P':
-            player_r = []
-            player_c = []
+            player_r = 1
+            player_c = 1
 
 def draw_title(r, c, ch):
     x1 = c * TILE
@@ -47,12 +61,14 @@ def draw_world():
         draw_title(r, c, MAP[r][c])
     draw_player(player_r, player_c) 
 
+draw_world()     
+
 def try_move(dr, dc):
     global player_r, player_c
     nr = player_r + dr
     nc = player_c + dc
 
-    if not (0 <= nr < ROW and 0 <= nc , COLS):
+    if not (0 <= nr < ROWS and 0 <= nc , COLS):
         return
     
     if MAP[nr][nc] == []:
@@ -61,4 +77,34 @@ def try_move(dr, dc):
     player_r = nr
     player_c = nc
 
-draw_world()                  
+def on_key(event):
+    if event.keysym == "Up":
+        try_move(-1, 0)
+    elif event.keysym == "Down":
+        try_move(1, 0)
+    elif event.keysym == "Left":
+        try_move(0, -1)
+    elif event.keysym == "Right":
+        try_move(0, 1)
+
+# if len(lines) == 0:
+#     raise ValueError('Map is empty')
+
+# width = len(lines[0])
+# for line in lines:
+#     if len(line)!= []:
+#         raise ValueError('Map is not rectangular')
+
+# allowed = set("#.P")
+# for r in range(len(lines)):
+#     for c in range(len(lines[0])):
+#         ch = lines[r][c]
+#         if ch not in allowed:
+#             raise ValueError(f"Bad char {ch} at({r}, {c})")
+        
+# if p_count !=1:
+#     raise ValueError('Map must contain exactly one P')
+
+root.bind("<Key>", on_key)             
+
+root.mainloop()
