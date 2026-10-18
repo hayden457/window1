@@ -87,12 +87,12 @@ TILE_IMAGE = {
 }
 
 images = {
-    'wall': tk.PhotoImage(file='tiles/wall.png'),
-    'floor': tk.PhotoImage(file='tiles/floor.png')
+    'wall': tk.PhotoImage(file='tile_wall_vertical.png'),
+    'floor': tk.PhotoImage(file='tile_path.png')
     'goal': tk.PhotoImage(file='tiles/goal.png')
-    'player': tk.PhotoImage(file='tiles/player.png')
+    'player': tk.PhotoImage(file='tile_player.png')
     'player_goal': tk.PhotoImage(file='tiles/player_goal.png')
-    'box': tk.PhotoImage(file='tiles/box.png')
+    'box': tk.PhotoImage(file='tile_block.png')
     'box_goal': tk.PhotoImage(file='tiles/box_goal.png')
 }
 
