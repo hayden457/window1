@@ -1,6 +1,8 @@
 import tkinter as tk
 
 TILE = 64
+W = 8
+H = 8
 
 current_level = 0
 
@@ -10,6 +12,39 @@ root.title("Sokoban")
 game_map = []
 player_r = 0
 player_c = 0
+
+canvas = tk.Canvas(root, width=W, height=H, bg="white")
+canvas.pack()
+
+TILE_IMAGE = {
+    '#': 'wall',
+    ' ': 'floor',
+    '.': 'goal',
+    '@': 'player',
+    '+': 'player_goal',
+    '$': 'box',
+    '*': 'box_goal'
+}
+
+images = {
+    'wall': tk.PhotoImage(file='tiles/tile_wall_vertical.png'),
+    'floor': tk.PhotoImage(file='tiles/tile_path.png'),
+    'goal': tk.PhotoImage(file='tiles/tile_goal.png'),
+    'player': tk.PhotoImage(file='tiles/tile_player.png'),
+    'player_goal': tk.PhotoImage(file='tiles/tile_player_goal.png'),
+    'box': tk.PhotoImage(file='tiles/tile_block.png'),
+    'box_goal': tk.PhotoImage(file='tiles/tile_goal.png')
+}
+LEVELS = [
+    [
+        "#######",
+        "#     #",
+        "# .$. #",
+        "# .@. #",
+        "#     #",
+        "#######",
+    ]
+]
 
 def load_level(index):
     global game_map, player_r, player_c
@@ -28,7 +63,7 @@ def load_level(index):
     cols = len(game_map[0])
     canvas.config(width=cols*TILE, height=rows*TILE)
 
-def draw_title(r, c, key)
+def draw_title(r, c, key):
     x = c * TILE
     y = r * TILE
     canvas.create_image(x, y, image=images[key], anchor='nw')
@@ -55,10 +90,10 @@ def try_move(dr, dc):
         return
 
     if tile in (' ', '.'):
-        _move_player(nr, nc)
+        move_player(nr, nc)
 
     elif tile in ('$', '*'):
-        br = nr + dc
+        br = nr + dr
         bc = nc + dc
 
         if not (0 <= br < len(game_map) and 0 <= bc < len(game_map[0])):
@@ -66,8 +101,8 @@ def try_move(dr, dc):
         box_dest = game_map[br][bc]
 
         if box_dest in (' ', '.'):
-            _push_box(nr, nc, br, bc)
-            _move_player(nr, nc)
+            push_box(nr, nc, br, bc)
+            move_player(nr, nc)
 
 def move_player(nr, nc):
     global player_r, player_c
@@ -75,30 +110,18 @@ def move_player(nr, nc):
     if game_map[player_r][player_c] == '+':
         game_map[player_r][player_c] == '.'
 
-TILE_IMAGE = {
-    '#': 'wall',
-    ' ': 'floor',
-    '.': 'goal',
-    '@': 'player',
-    '+': 'player_goal',
-    '$': 'box',
-    '*': 'box_goal',
 
-}
+def push_box():
+    game_map[br][bc] = '*' if game_map[br][bc] == '.' else '$'
 
-images = {
-    'wall': tk.PhotoImage(file='tile_wall_vertical.png'),
-    'floor': tk.PhotoImage(file='tile_path.png')
-    'goal': tk.PhotoImage(file='tiles/goal.png')
-    'player': tk.PhotoImage(file='tile_player.png')
-    'player_goal': tk.PhotoImage(file='tiles/player_goal.png')
-    'box': tk.PhotoImage(file='tile_block.png')
-    'box_goal': tk.PhotoImage(file='tiles/box_goal.png')
-}
+def check_win():
+    for row in game_map:
+        if '$' in row:
+            return
+    print("You win!")
 
-def check_win()
-
-check_win()
+#check_win()
+print()
 draw_world()
 
 root.mainloop()
