@@ -1,4 +1,5 @@
 import tkinter as tk
+from PIL import Image, ImageTk
 
 TILE = 64
 W = 8
@@ -26,14 +27,20 @@ TILE_IMAGE = {
     '*': 'box_goal'
 }
 
+def load_tile(filename):
+    img = Image.open('tiles/' + filename)
+    img = img.resize((TILE, TILE), Image.NEAREST)
+    return ImageTk.PhotoImage(img)
+
+
 images = {
-    'wall': tk.PhotoImage(file='tiles/tile_wall_vertical.png'),
-    'floor': tk.PhotoImage(file='tiles/tile_path.png'),
-    'goal': tk.PhotoImage(file='tiles/tile_goal.png'),
-    'player': tk.PhotoImage(file='tiles/tile_player.png'),
-    'player_goal': tk.PhotoImage(file='tiles/tile_player_goal.png'),
-    'box': tk.PhotoImage(file='tiles/tile_block.png'),
-    'box_goal': tk.PhotoImage(file='tiles/tile_goal.png')
+    'wall': load_tile('tile_wall_vertical.png'),
+    'floor': load_tile('tile_path.png'),
+    'goal': load_tile('tile_goal.png'),
+    'player': load_tile('tile_player.png'),
+    'player_goal': load_tile('tile_player_goal.png'),
+    'box': load_tile('tile_block.png'),
+    'box_goal': load_tile('tile_goal.png')
 }
 LEVELS = [
     [
@@ -81,7 +88,7 @@ def try_move(dr, dc):
     nr = player_r + dr
     nc = player_c + dc
 
-    if not (0 <= nr < len(game_map[0])):
+    if not (0 <= nr < len(game_map) and 0 <= nc < len(game_map[0])):
         return
 
     tile = game_map[nr][nc]
@@ -122,6 +129,7 @@ def check_win():
 
 #check_win()
 print()
+load_level(0)
 draw_world()
 
 root.mainloop()
